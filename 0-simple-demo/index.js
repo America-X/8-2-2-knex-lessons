@@ -37,7 +37,15 @@ const createPet = async (name, type, owner_id) => {
 
 // given an owner name and type, return
 const getPetsByOwnerNameAndType = async (ownerName, type) => {
-
+  const query = `
+    SELECT pets.id, pets.name FROM pets
+    JOIN people ON pets.owner_id = people.id
+    WHERE people.name=?   
+    AND pets.type=?
+  `
+  // name and type order must match the array  |
+  const { rows } = await knex.raw(query, [ownerName, type]);  // this array determines the order in which the parameters get called; 
+  return rows;
 }
 
 const main = async () => {
@@ -49,7 +57,7 @@ const main = async () => {
   const people = await getPeople();
   console.log('people:', people);
 
-  const annsDogs = await getPetsByOwnerNameAndType('ann', 'dog');
+  const annsDogs = await getPetsByOwnerNameAndType('Ann Duong', 'dog');
   console.log('anns dogs:', annsDogs);
 
   knex.destroy();
